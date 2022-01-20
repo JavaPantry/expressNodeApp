@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const bodyParser = require('body-parser')
+
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/nodekb');
 let db = mongoose.connection;
@@ -25,9 +27,16 @@ const Article = require('./models/article');
 // load view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+// Body Parser Middleware
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+app.use(bodyParser.json())
+
+
 // root route
 // app.get('/', (req, res) => res.send('Hello World!'));
-
 // add home route http://localhost:3000/
 app.get('/', (req, res) => {
     // const articles = [
@@ -72,6 +81,26 @@ app.get('/articles/add', (req, res) => {
     })
 });
 
+// add Submit POST route http://localhost:3000/articles/add
+
+app.post('/articles/add', (req, res) => {
+    console.log('Submitted POST DATA', req.body);  
+    let article = new Article();
+    article.title = req.body.title;
+    article.author = req.body.author;
+    article.body = req.body.body;
+    console.log("Received Article", article);
+    article.save((err) => {
+        if (err) {
+            console.log('Save error', err); 
+            res.redirect('/');
+        }else{
+            console.log('Saved successfully');
+            res.redirect('/');
+        }
+    });
+    return; //Article.create(req.body, (err, article) => {})
+});
 
 // start server
 app.listen(port, function() {
