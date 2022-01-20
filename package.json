@@ -1,0 +1,15 @@
+{
+  "name": "nodekb",
+  "version": "1.0.0",
+  "description": "simple knowledge base app",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app"
+  },
+  "author": "Alexei Ptitchkin",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "pug": "^3.0.2"
+  }
+}

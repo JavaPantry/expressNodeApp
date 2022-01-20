@@ -1,0 +1,15 @@
+extends layout 
+
+block content
+    h1 #{title}
+    ul 
+        each article, i in articles
+            article
+                //li a(href='/articles/#{article.id}') #{article.title}
+                li= article.title
+                p #{article.body}
+                p
+                    a(href='/articles/#{article.id}/edit') Edit | 
+                    a(href='/articles/#{article.id}/delete') Delete
+                br
+                hr
