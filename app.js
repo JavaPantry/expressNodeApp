@@ -77,6 +77,24 @@ app.get('/', (req, res) => {
 
     }); 
 
+// add route for single article
+app.get('/article/:id', (req, res) => {
+                                    Article.findById(req.params.id, (err, article) => {
+                                            if (err) {
+                                                console.log(err);
+                                            } else {
+                                                //console.log(article); // print article record
+                                                res.render('article', {article: article})
+                                            }
+                                        }
+                                    )
+                                    // res.render('add_article', {
+                                    //     title: 'Add Article'
+                                }
+        );
+
+    
+
 // add route http://localhost:3000/articles/add
 app.get('/articles/add', (req, res) => {
     res.render('add_article', {
@@ -85,7 +103,6 @@ app.get('/articles/add', (req, res) => {
 });
 
 // add Submit POST route http://localhost:3000/articles/add
-
 app.post('/articles/add', (req, res) => {
     console.log('Submitted POST DATA', req.body);  
     let article = new Article();

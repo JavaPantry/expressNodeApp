@@ -6,9 +6,10 @@ block content
         each article, i in articles
             article
                 //li a(href='/articles/#{article.id}') #{article.title}
-                li.list-group-item= article.title
-                p #{article.body}
-                p
+                li.list-group-item
+                    a(href=`/article/${article._id}`)= article.title
+                    p #{article.body}
+                    p
                     a(href='/articles/#{article.id}/edit') Edit | 
                     a(href='/articles/#{article.id}/delete') Delete
                 br
