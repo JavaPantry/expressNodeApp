@@ -2,9 +2,25 @@ doctype html
 html
     head
         title Knowledge
+        //- link(rel="stylesheet", href="/css/style.css")
+        link(rel="stylesheet", href="/bower_components/bootstrap/dist/css/bootstrap.min.css")
     body 
-        block content 
-        br
-        hr
-        footer 
-            p Copyright &copy; #{new Date().getFullYear()}
+        nav.navbar.navbar-expand-lg.navbar-light.bg-light
+            .container-fluid
+                a.navbar-brand(href='#') Express KB
+                button.navbar-toggler(type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav' aria-controls='navbarNav' aria-expanded='false' aria-label='Toggle navigation')
+                    span.navbar-toggler-icon
+                #navbarNav.collapse.navbar-collapse
+                    ul.navbar-nav
+                        li.nav-item
+                            a.nav-link.active(aria-current='page' href='/') Home
+                        li.nav-item
+                            a.nav-link(href='/articles/add') Add Article
+                        li.nav-item
+                            a.nav-link.disabled Disabled
+        .container 
+            block content 
+            br
+            hr
+            footer 
+                p Copyright &copy; #{new Date().getFullYear()}
