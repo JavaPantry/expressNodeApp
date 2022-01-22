@@ -17,6 +17,6 @@ block content
                     //- p #{article.body}
                     a.btn.btn-outline-primary.btn-sm(href='/article/edit/'+article._id) Edit 
                     | 
-                    a.btn.btn-outline-danger.btn-sm(href='/article/delete/'+article._id)  Delete
-                //- br
-                //- hr
+                    //- a.btn.btn-outline-danger.btn-sm(href='/article/delete/'+article._id)  Delete
+                    //- a.btn.btn-outline-danger.btn-sm.delete-article(href='#'+article._id)  Delete
+                    //- Put this button on edit form: a.btn.btn-outline-danger.btn-sm.delete-article(href='#', data-id=article._id)  Delete

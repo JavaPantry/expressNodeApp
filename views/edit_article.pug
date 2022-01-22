@@ -13,6 +13,8 @@ block content
             label(for="body") Body:
             textarea.form-control(type="text", name="body", id="body", placeholder="body")= article.body
         br
-        input.btn.btn-primary(type="submit", value="Save")
+        input.btn.btn-primary.btn-sm(type="submit", value="Save")
         | 
-        a.btn.btn-danger(href='/') Cancel
+        a.btn.btn-outline-danger.btn-sm(href='/') Cancel 
+        |
+        a.btn.btn-danger.btn-sm.delete-article(href='#', data-id=article._id) Delete

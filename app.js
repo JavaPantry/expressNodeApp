@@ -70,6 +70,37 @@ app.get('/article/:id', (req, res) => {
                                 }
         );
 
+// Delete Article
+app.delete('/article/:id', async (req, res) => {
+    try {
+    //   if (!req.user._id) {
+    //     res.status(500).send();
+    //   }
+      let query = { _id: req.params.id }
+      const article = await Article.findById(req.params.id);
+  
+      Article.remove(query, (err) => {
+        if (err) {
+          console.log(err);
+        }
+        res.send('Success');
+      }
+      );
+
+    //   if (article.author != req.user._id) {
+    //     res.status(500).send();
+    //   } else {
+    //     remove = await Article.findByIdAndRemove(query);
+    //     if (remove) {
+    //       res.send('Success');
+    //     }
+    //   };
+    } catch (e) {
+      res.send(e);
+    }
+  
+  });
+
 // Load Edit Form - route for edit article
 app.get('/article/edit/:id', (req, res) => {
     Article.findById(req.params.id, (err, article) => {
