@@ -42,34 +42,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.get('/', (req, res) => res.send('Hello World!'));
 // add home route http://localhost:3000/
 app.get('/', (req, res) => {
-    // const articles = [
-    //     {
-    //         id: 1,
-    //         title: 'Article One',
-    //         author: 'John Doe',
-    //         body: 'Article One. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quidem.'
-    //     },
-    //     {
-    //         id: 2,
-    //         title: 'Article Two',
-    //         author: 'Alexei Ptitchkin',
-    //         body: 'Article Two. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quidem.'
-    //     },
-    //     {
-    //         id: 3,
-    //         title: 'Article Three',
-    //         author: 'Alexei Andreev',
-    //         body: 'Article Three. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quidem.'
-    //     }
-    // ];
-    
     let articles = Article.find({}, (err, articles) => {
         if (err) {
             console.log(err);
         } else {
             console.log(articles);
             res.render('index', {
-                title: 'Hey! Hello there from node monitor!'
+                title: 'Articles:'
                 , articles: articles}
                 );
         }}).sort({_id: -1});
@@ -88,12 +67,47 @@ app.get('/article/:id', (req, res) => {
                                             }
                                         }
                                     )
-                                    // res.render('add_article', {
-                                    //     title: 'Add Article'
                                 }
         );
 
-    
+// Load Edit Form - route for edit article
+app.get('/article/edit/:id', (req, res) => {
+    Article.findById(req.params.id, (err, article) => {
+            if (err) {
+                console.log(err);
+            } else {
+                res.render('edit_article', {title:'Edit Article "'+article.title+'"', article: article})
+            }
+        }
+    )
+}
+);
+
+// Update/Save Edit Article Form - route for POST edit article
+app.post('/article/edit/:id', (req, res) => {
+    console.log('Submitted POST DATA', req.body);  
+    let article = {};
+    article.title = req.body.title;
+    article.author = req.body.author;
+    article.body = req.body.body;
+    console.log("Received Article", article);
+
+    let query = {_id: req.params.id}
+
+    Article.update(query, article, (err) => {
+        if (err) {
+            console.log('Save error', err); 
+            return
+            // res.redirect('/');
+        }else{
+            console.log('Saved successfully');
+            res.redirect('/');
+        }
+    });
+    return;
+});
+
+
 
 // add route http://localhost:3000/articles/add
 app.get('/articles/add', (req, res) => {

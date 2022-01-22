@@ -8,9 +8,15 @@ block content
                 //li a(href='/articles/#{article.id}') #{article.title}
                 li.list-group-item
                     a(href=`/article/${article._id}`)= article.title
-                    p #{article.body}
-                    p
-                    a(href='/articles/#{article.id}/edit') Edit | 
-                    a(href='/articles/#{article.id}/delete') Delete
-                br
-                hr
+                    |
+                    span By : #{article.author}
+                    | 
+                    //- span.badge.badge-primary.float-right= article.author
+                    //- span.badge.badge-success= article.author 
+                    //- article.author rendered in browser as invisible <span class="badge badge-success">article.author</span>
+                    //- p #{article.body}
+                    a.btn.btn-outline-primary.btn-sm(href='/article/edit/'+article._id) Edit 
+                    | 
+                    a.btn.btn-outline-danger.btn-sm(href='/article/delete/'+article._id)  Delete
+                //- br
+                //- hr
