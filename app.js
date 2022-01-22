@@ -13,7 +13,6 @@ db.once('open', function() {
 });
 
 // check for db errors
-//db.on('error', console.error.bind(console, 'connection error:'));
 db.on('error', function(err) {
     console.log('connection error:', err);
 });
@@ -23,7 +22,7 @@ db.on('error', function(err) {
 const app = express();
 const port = 3000;
 
-// load models
+// Bring in Models
 const Article = require('./models/article');
 
 // load view engine
@@ -55,32 +54,9 @@ next();
   
 
 // Express Validator Middleware
-
-// from new validator docs https://express-validator.github.io/docs/#basic-guide
 const { body, validationResult } = require('express-validator');
 
-// TypeError: expressValidator is not a function at Object.<anonymous> (C:\IntelliJ_WS_MPS_apps\nodekb\app.js:59:9)
-//const expressValidator = require('express-validator');
-/*app.use(expressValidator({
-    errorFormatter: function (param, msg, value) {
-      var namespace = param.split('.')
-        , root = namespace.shift()
-        , formParam = root;
-  
-      while (namespace.length) {
-        formParam += '[' + namespace.shift() + ']';
-      }
-      return {
-        param: formParam,
-        msg: msg,
-        value: value
-      };
-    }
-  }));
-*/
 
-// root route
-// app.get('/', (req, res) => res.send('Hello World!'));
 // add home route http://localhost:3000/
 app.get('/', (req, res) => {
     let articles = Article.find({}, (err, articles) => {
@@ -97,153 +73,10 @@ app.get('/', (req, res) => {
 
     }); 
 
-// add route for single article
-app.get('/article/:id', (req, res) => {
-                                    Article.findById(req.params.id, (err, article) => {
-                                            if (err) {
-                                                console.log(err);
-                                            } else {
-                                                //console.log(article); // print article record
-                                                res.render('article', {article: article})
-                                            }
-                                        }
-                                    )
-                                }
-        );
+// Route Files
+let articles = require('./routes/articles');
+app.use('/articles', articles);
 
-// Delete Article
-app.delete('/article/:id', async (req, res) => {
-    try {
-    //   if (!req.user._id) {
-    //     res.status(500).send();
-    //   }
-      let query = { _id: req.params.id }
-      const article = await Article.findById(req.params.id);
-  
-      Article.remove(query, (err) => {
-        if (err) {
-          console.log(err);
-        }
-        res.send('Success');
-      }
-      );
-
-    //   if (article.author != req.user._id) {
-    //     res.status(500).send();
-    //   } else {
-    //     remove = await Article.findByIdAndRemove(query);
-    //     if (remove) {
-    //       res.send('Success');
-    //     }
-    //   };
-    } catch (e) {
-      res.send(e);
-    }
-  
-  });
-
-// Load Edit Form - route for edit article
-app.get('/article/edit/:id', (req, res) => {
-    Article.findById(req.params.id, (err, article) => {
-            if (err) {
-                console.log(err);
-            } else {
-                res.render('edit_article', {title:'Edit Article "'+article.title+'"', article: article})
-            }
-        }
-    )
-}
-);
-
-// Update/Save Edit Article Form - route for POST edit article
-app.post('/article/edit/:id', (req, res) => {
-    console.log('Submitted POST DATA', req.body);  
-    let article = {};
-    article.title = req.body.title;
-    article.author = req.body.author;
-    article.body = req.body.body;
-    console.log("Received Article", article);
-
-    let query = {_id: req.params.id}
-
-    Article.update(query, article, (err) => {
-        if (err) {
-            console.log('Save error', err); 
-            req.flash('danger', 'Article failed to update');
-            return
-            // res.redirect('/');
-        }else{
-            //console.log('Saved successfully');
-            req.flash('success', 'Article Saved successfully');
-            res.redirect('/');
-        }
-    });
-    return;
-});
-
-
-
-// add route http://localhost:3000/articles/add
-app.get('/articles/add', (req, res) => {
-    res.render('add_article', {
-        title: 'Add Article'
-    })
-});
-
-// add Submit POST route http://localhost:3000/articles/add
-app.post('/articles/add', 
-            body('title').notEmpty(),
-            body('author').notEmpty(),
-            body('body').notEmpty(),
-            (req, res) => {
-                console.log('Submitted POST DATA', req.body);  
-
-                // old validator way
-                // req.checkBody('title', 'Title is required').notEmpty();
-                // req.checkBody('body', 'Body is required').notEmpty();
-                // Get Errors
-                // let errors = req.validationErrors();
-
-                // new validator way add following lines before '(req, res) =>{...}'
-                //   body('title').notEmpty().withMessage('Title is required');
-                //   body('body').notEmpty().withMessage('Article body is required');
-                const errors = validationResult(req).errors;
-                // log type of errors
-                console.log('Type of errors', typeof errors);
-                console.log('is errors an array? ', errors instanceof Array);
-                console.log('validationResult = ', errors);  
-                // if errors array not empty exist, render form again with errors
-                if (errors.length > 0) {  //insead if (!errors.isEmpty()) {
-                    // following line is not working
-                    //return res.status(400).json({ errors: errors.array() });
-                    // it just print errors to page
-                    // {"errors":[{"value":"","msg":"Invalid value","param":"title","location":"body"},{"value":"","msg":"Invalid value","param":"author","location":"body"},{"value":"","msg":"Invalid value","param":"body","location":"body"}]}
-                    // following line is working
-                    res.render('add_article', {
-                        title: 'Add Article',
-                        errors: errors//.array()
-                    })
-                    return;
-                }
-
-                let article = new Article();
-                article.title = req.body.title;
-                article.author = req.body.author;
-                article.body = req.body.body;
-                console.log("Received Article", article);
-                article.save((err) => {
-                    if (err) {
-                        console.log('Save error', err); 
-                        res.redirect('/');
-                    }else{
-                        // console.log('Saved successfully');
-                        req.flash('success', 'Article Added');
-                        res.redirect('/');
-                    }
-                });
-                return; //Article.create(req.body, (err, article) => {})
-            }
-);
 
 // start server
 app.listen(port, function() {

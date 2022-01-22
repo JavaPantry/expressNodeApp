@@ -12,7 +12,7 @@ $(document).ready(function() {
         //make ajax call to delete article
         $.ajax({
             method: 'DELETE',
-            url: '/article/' + articleId
+            url: '/articles/' + articleId
         }).then(function(data) {
             //reload page
             //location.reload();
@@ -30,7 +30,7 @@ $(document).ready(function(){
     const id = $target.attr('data-id');
     $.ajax({
       type:'DELETE',
-      url: '/article/'+id,
+      url: '/articles/'+id,
       success: function(response){
         alert('Deleting Article');
         window.location.href='/';
