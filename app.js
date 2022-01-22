@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser')
-const expressValidator = require('express-validator');
 const flash = require('connect-flash');
 const session = require('express-session');
 
@@ -56,7 +55,12 @@ next();
   
 
 // Express Validator Middleware
+
+// from new validator docs https://express-validator.github.io/docs/#basic-guide
+const { body, validationResult } = require('express-validator');
+
 // TypeError: expressValidator is not a function at Object.<anonymous> (C:\IntelliJ_WS_MPS_apps\nodekb\app.js:59:9)
+//const expressValidator = require('express-validator');
 /*app.use(expressValidator({
     errorFormatter: function (param, msg, value) {
       var namespace = param.split('.')
@@ -187,25 +191,59 @@ app.get('/articles/add', (req, res) => {
 });
 
 // add Submit POST route http://localhost:3000/articles/add
-app.post('/articles/add', (req, res) => {
-    console.log('Submitted POST DATA', req.body);  
-    let article = new Article();
-    article.title = req.body.title;
-    article.author = req.body.author;
-    article.body = req.body.body;
-    console.log("Received Article", article);
-    article.save((err) => {
-        if (err) {
-            console.log('Save error', err); 
-            res.redirect('/');
-        }else{
-            // console.log('Saved successfully');
-            req.flash('success', 'Article Added');
-            res.redirect('/');
-        }
-    });
-    return; //Article.create(req.body, (err, article) => {})
-});
+app.post('/articles/add', 
+            body('title').notEmpty(),
+            body('author').notEmpty(),
+            body('body').notEmpty(),
+            (req, res) => {
+                console.log('Submitted POST DATA', req.body);  
+
+                // old validator way
+                // req.checkBody('title', 'Title is required').notEmpty();
+                // req.checkBody('body', 'Body is required').notEmpty();
+                // Get Errors
+                // let errors = req.validationErrors();
+
+                // new validator way add following lines before '(req, res) =>{...}'
+                //   body('title').notEmpty().withMessage('Title is required');
+                //   body('body').notEmpty().withMessage('Article body is required');
+                const errors = validationResult(req).errors;
+                // log type of errors
+                console.log('Type of errors', typeof errors);
+                console.log('is errors an array? ', errors instanceof Array);
+                console.log('validationResult = ', errors);  
+                // if errors array not empty exist, render form again with errors
+                if (errors.length > 0) {  //insead if (!errors.isEmpty()) {
+                    // following line is not working
+                    //return res.status(400).json({ errors: errors.array() });
+                    // it just print errors to page
+                    // {"errors":[{"value":"","msg":"Invalid value","param":"title","location":"body"},{"value":"","msg":"Invalid value","param":"author","location":"body"},{"value":"","msg":"Invalid value","param":"body","location":"body"}]}
+                    // following line is working
+                    res.render('add_article', {
+                        title: 'Add Article',
+                        errors: errors//.array()
+                    })
+                    return;
+                }
+
+                let article = new Article();
+                article.title = req.body.title;
+                article.author = req.body.author;
+                article.body = req.body.body;
+                console.log("Received Article", article);
+                article.save((err) => {
+                    if (err) {
+                        console.log('Save error', err); 
+                        res.redirect('/');
+                    }else{
+                        // console.log('Saved successfully');
+                        req.flash('success', 'Article Added');
+                        res.redirect('/');
+                    }
+                });
+                return; //Article.create(req.body, (err, article) => {})
+            }
+);
 
 // start server
 app.listen(port, function() {

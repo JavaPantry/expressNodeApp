@@ -20,6 +20,13 @@ html
                             a.nav-link.disabled Disabled
         .container 
             != messages('message', locals)
+
+            if errors
+                each error, i in errors
+                    div.alert.alert-danger #{error.param} #{error.msg}
+
+
+
             block content 
             br
             hr
