@@ -100,6 +100,11 @@ require('./middleware/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('*', function (req, res, next) {
+    res.locals.user = req.user || null;
+    next();
+  });
+  
 // add home route http://localhost:3000/
 app.get('/', (req, res) => {
     let articles = Article.find({}, (err, articles) => {
