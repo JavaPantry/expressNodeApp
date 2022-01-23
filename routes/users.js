@@ -18,12 +18,22 @@ router.post('/register',
     body("email").isEmail(),
     body("username").notEmpty(),
     body("password").notEmpty(),
-    body("password2").equals(body.password),
+    //body("password2").equals(body("password")),
+    body("password2").notEmpty(),
     async (req, res) => {
 
         const errors = validationResult(req).errors;
         // if errors array not empty exist, render form again with errors
         if (errors.length > 0) {
+          
+            console.log("received fields\n",
+            req.body.name,
+            req.body.email,
+            req.body.username,
+            req.body.password,
+            req.body.password2)
+
+          console.log(errors);  
           res.render("register", {
             title: "fill out all required fields before submit new User",
             errors: errors
