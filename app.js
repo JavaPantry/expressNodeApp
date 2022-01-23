@@ -5,6 +5,11 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
 
+
+
+/* 
+before refactoring
+
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/nodekb');
 let db = mongoose.connection;
@@ -17,6 +22,38 @@ db.once('open', function() {
 db.on('error', function(err) {
     console.log('connection error:', err);
 });
+ */
+
+// Initial refactoring
+/* 
+// Initial refactoring database.js content:
+module.exports = {
+    database: 'mongodb://localhost:27017/nodekb',
+    secret: 'yoursecret'
+  }
+ */
+const mongoose = require('mongoose');
+const config =  require('./config/database');
+mongoose.connect(config.database);
+let db = mongoose.connection;
+
+// check connection
+db.once('open', function() {
+    console.log('Connected to MongoDB');
+});
+
+// check for db errors
+db.on('error', function(err) {
+    console.log('connection error:', err);
+});
+
+
+/* 
+2nd refactoring
+//const mongoose = require('mongoose');
+const config = require('dotenv').config();
+const connectDB = require('./config/database');
+connectDB(); */
 
 
 // Init app
