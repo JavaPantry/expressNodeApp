@@ -3,6 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser')
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('passport');
 
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/nodekb');
@@ -56,6 +57,11 @@ next();
 // Express Validator Middleware
 const { body, validationResult } = require('express-validator');
 
+// Passport Config
+require('./middleware/passport')(passport);
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // add home route http://localhost:3000/
 app.get('/', (req, res) => {
@@ -75,7 +81,9 @@ app.get('/', (req, res) => {
 
 // Route Files
 let articles = require('./routes/articles');
+let users = require('./routes/users');
 app.use('/articles', articles);
+app.use('/users', users);
 
 
 // start server
