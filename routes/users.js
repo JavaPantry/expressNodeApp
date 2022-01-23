@@ -18,7 +18,7 @@ router.post('/register',
     body("email").isEmail(),
     body("username").notEmpty(),
     body("password").notEmpty(),
-    body("password2").notEmpty(),
+    body("password2").equals(body.password),
     async (req, res) => {
 
         const errors = validationResult(req).errors;
@@ -31,27 +31,6 @@ router.post('/register',
           return;
         }
 
-  /* const name = req.body.name;
-  const email = req.body.email;
-  const username = req.body.username;
-  const password = req.body.password;
-  const password2 = req.body.password2;
-
-  req.checkBody('name', 'Name is required').notEmpty();
-  req.checkBody('email', 'Email is required').notEmpty();
-  req.checkBody('email', 'Email is not valid').isEmail();
-  req.checkBody('username', 'Username is required').notEmpty();
-  req.checkBody('password', 'Password is required').notEmpty();
-  req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
- */
-
-/*   let errors = req.validationErrors();
-
-  if (errors) {
-    res.render('register', {
-      errors: errors
-    });
-  } else { */
     const salt = await bcrypt.genSalt(10);
     const newUser = await User.create({
       name: req.body.name,
@@ -62,7 +41,6 @@ router.post('/register',
     newUser.save();
     req.flash('success', 'You are now registered and can log in');
     res.redirect('/users/login');
-  /* } */
 });
 
 
