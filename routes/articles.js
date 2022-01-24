@@ -4,22 +4,32 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 
 // Bring in Models
-//const { Article } = require("../models/article");
 const Article = require('../models/article');
+const User = require("../models/user");
 
 
 // Delete Article
 router.delete("/:id", async (req, res) => {
   try {
-    let query = { _id: req.params.id };
-    const article = await Article.findById(req.params.id);
 
-    Article.remove(query, (err) => {
-      if (err) {
-        console.log(err);
-      }
-      res.send("Success");
-    });
+    if(!req.user._id){
+      res.status(500).send();
+    }
+
+    let query = { _id: req.params.id };
+    //const article = await Article.findById(req.params.id);
+    Article.findById(req.params.id, (err, article) => {
+        if(article.author != req.user._id){
+          res.status(500).send();
+        }else{
+          Article.remove(query, (err) => {
+            if (err) {
+              console.log(err);
+            }
+            res.send("Success");
+          });
+        }    
+      });
   } catch (e) {
     res.send(e);
   }
@@ -31,16 +41,22 @@ router.get("/edit/:id", (req, res) => {
     if (err) {
       console.log(err);
     } else {
+      if( article.author != req.user._id ){
+         req.flash('danger', 'Not Authorized')
+         res.redirect('/')
+      }
       res.render("edit_article", {
         title: 'Edit Article "' + article.title + '"',
         article: article,
       });
+    };
     }
-  });
+  )
 });
 
+
 // Update/Save Edit Article Form - route for POST edit article
-router.post("/edit/:id", (req, res) => {
+router.post("/edit/:id", ensureAuthenticated, (req, res) => {
   console.log("Submitted POST DATA", req.body);
   let article = {};
   article.title = req.body.title;
@@ -64,7 +80,7 @@ router.post("/edit/:id", (req, res) => {
 });
 
 // add route http://localhost:3000/articles/add
-router.get("/add", (req, res) => {
+router.get("/add", ensureAuthenticated, (req, res) => {
   res.render("add_article", {
     title: "Add Article",
   });
@@ -74,7 +90,6 @@ router.get("/add", (req, res) => {
 router.post(
   "/add",
   body("title").notEmpty(),
-  body("author").notEmpty(),
   body("body").notEmpty(),
   (req, res) => {
     console.log("Submitted POST DATA", req.body);
@@ -90,7 +105,7 @@ router.post(
 
     let article = new Article();
     article.title = req.body.title;
-    article.author = req.body.author;
+    article.author = req.user._id;
     article.body = req.body.body;
     console.log("Received Article", article);
     article.save((err) => {
@@ -128,10 +143,24 @@ router.get("/:id", (req, res) => {
         console.log(err);
       } else {
         //console.log(article); // print article record
-        res.render("article", { article: article });
+        User.findById(article.author, (err, user) => {
+          res.render("article", { 
+            article: article, 
+            author: user.name
+          });
+        })
+        
       }
     });
   });
   
-
+// Access control - ensure user is logged in
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    req.flash("danger", "Please login first");
+    res.redirect("/users/login");
+  }
+}
 module.exports = router;

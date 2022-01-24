@@ -3,10 +3,14 @@ extends layout
 block content
     //- h1 #{article.title} 
     h1= article.title
-    h5 Written By #{article.author} 
+    h5 Written By #{author} 
     hr
     p= article.body
     hr
-    a.btn.btn-primary(href='/articles/edit/'+article._id) Edit
+    if user
+        if user.id == article.author
+            a.btn.btn-primary.btn-sm(href='/articles/edit/'+article._id) Edit
+            | 
+            a.btn.btn-danger.btn-sm.delete-article(href='#', data-id=article._id) Delete
     | 
-    a.btn.btn-outline-success(href='/') Back Home
+    a.btn.btn-outline-success.btn-sm(href='/') Back Home
